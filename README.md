@@ -20,7 +20,14 @@
   - Also feel free to change some parameters.
   
 # Result
-- ![accuracy](./log/tmp/accuracy.jpg)
+- Accuracy on VGGFace2 and LFW datasets
+![accuracy](./log/tmp/accuracy.jpg)
+
+- Triplet loss on VGGFace2 and LFW datasets
+![loss](./log/tmp/loss.jpg)
+
+- ROC curve
+![roc curve](./log/tmp/roc.png)
 
 
 # References
