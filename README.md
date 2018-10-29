@@ -3,7 +3,8 @@
 - Training of network is done using triplet loss.
 - I will update codes and git repository after my doctoral defence on Nov. 20th 2018. 
 
-# How to train model
+
+# How to train/validate model
 - Download vggface2 (for training) and lfw (for validation) datasets.
   - https://www.robots.ox.ac.uk/%7Evgg/data/vgg_face2/
   - http://vis-www.cs.umass.edu/lfw/lfw.tgz
@@ -19,6 +20,7 @@
   - Again, one need to modify paths in accordance with location of image dataset.
   - Also feel free to change some parameters.
   
+  
 # Result
 
 - Accuracy on VGGFace2 and LFW datasets
@@ -32,6 +34,7 @@
 - ROC curve on LF datasets for validation
 
 ![roc curve](./log/tmp/roc_valid_epoch_39.png)
+
 
 # References
 - https://github.com/liorshk/facenet_pytorch 
