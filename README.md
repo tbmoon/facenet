@@ -20,15 +20,18 @@
   - Also feel free to change some parameters.
   
 # Result
+
 - Accuracy on VGGFace2 and LFW datasets
+
 ![accuracy](./log/tmp/accuracy.jpg)
 
 - Triplet loss on VGGFace2 and LFW datasets
+
 ![loss](./log/tmp/loss.jpg)
 
 - ROC curve
-![roc curve](./log/tmp/roc.png)
 
+![roc curve](./log/tmp/roc_valid_epoch_39.png.png)
 
 # References
 - https://github.com/liorshk/facenet_pytorch 
