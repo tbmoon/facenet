@@ -31,7 +31,7 @@
 
 - ROC curve
 
-![roc curve](./log/tmp/roc_valid_epoch_39.png.png)
+![roc curve](./log/tmp/roc_valid_epoch_39.png)
 
 # References
 - https://github.com/liorshk/facenet_pytorch 
