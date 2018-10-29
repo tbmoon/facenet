@@ -20,7 +20,7 @@
   - Also feel free to change some parameters.
   
 # Result
-- ![accuracy.jpg](./datasets/accuracy.jpg)
+- ![accuracy](./log/tmp/accuracy.jpg)
 
 
 # References
