@@ -13,10 +13,15 @@
 
 - Write list file of face images by running "datasets/write_csv_for_making_dataset.ipynb" 
   - This is aready in the directory of datasets so that you don't need to do again if you are urgent.
-  - To run this one need to modify path in accordance with location of image dataset.
+  - To run this one need to modify paths in accordance with location of image dataset.
   
+- Train
+  - Again, one need to modify paths in accordance with location of image dataset.
+  - Also feel free to change some parameters.
+  
+# Result
 - 
-  
+
 
 # References
 - https://github.com/liorshk/facenet_pytorch 
