@@ -31,7 +31,7 @@
 
 ![loss](./log/tmp/loss.jpg)
 
-- ROC curve on LF datasets for validation
+- ROC curve on LFW datasets for validation
 
 ![roc curve](./log/tmp/roc_valid_epoch_39.png)
 
