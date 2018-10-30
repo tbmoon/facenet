@@ -1,4 +1,4 @@
-# Facenet
+# Facenet for face recognition using pytorch
 - Pytorch implementation of the paper: "FaceNet: A Unified Embedding for Face Recognition and Clustering".
 - Training of network is done using triplet loss.
 - I will update codes and git repository for a better accuracy after my doctoral defence on Nov. 20th 2018. 
@@ -21,7 +21,7 @@
   - Also feel free to change some parameters.
   
   
-# Result
+# Results
 
 - Accuracy on VGGFace2 and LFW datasets
 
