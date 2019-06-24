@@ -30,7 +30,7 @@ class TripletFaceDataset(Dataset):
             for idx, label in enumerate(df['class']):
                 if label not in face_classes:
                     face_classes[label] = []
-                face_classes[label].append(df.iloc[idx, 0])
+                face_classes[label].append((df.iloc[idx]['id'], df.iloc[idx]['ext']))
             return face_classes
         
         triplets    = []
@@ -66,19 +66,25 @@ class TripletFaceDataset(Dataset):
                     ipos = np.random.randint(0, len(face_classes[pos_class]))
             ineg = np.random.randint(0, len(face_classes[neg_class]))
             
-            triplets.append([face_classes[pos_class][ianc], face_classes[pos_class][ipos], face_classes[neg_class][ineg], 
-                             pos_class, neg_class, pos_name, neg_name])
+            anc_id = face_classes[pos_class][ianc][0]
+            anc_ext = face_classes[pos_class][ianc][1]
+            pos_id = face_classes[pos_class][ipos][0]
+            pos_ext = face_classes[pos_class][ipos][1]
+            neg_id = face_classes[neg_class][ineg][0]
+            neg_ext = face_classes[neg_class][ineg][1]
+            
+            triplets.append([anc_id, pos_id, neg_id, pos_class, neg_class, pos_name, neg_name, anc_ext, pos_ext, neg_ext])
         
         return triplets
     
     
     def __getitem__(self, idx):
         
-        anc_id, pos_id, neg_id, pos_class, neg_class, pos_name, neg_name = self.training_triplets[idx]
+        anc_id, pos_id, neg_id, pos_class, neg_class, pos_name, neg_name, anc_ext, pos_ext, neg_ext = self.training_triplets[idx]
         
-        anc_img   = os.path.join(self.root_dir, str(pos_name), str(anc_id) + '.png')
-        pos_img   = os.path.join(self.root_dir, str(pos_name), str(pos_id) + '.png')
-        neg_img   = os.path.join(self.root_dir, str(neg_name), str(neg_id) + '.png')
+        anc_img   = os.path.join(self.root_dir, str(pos_name), str(anc_id) + f'.{anc_ext}')
+        pos_img   = os.path.join(self.root_dir, str(pos_name), str(pos_id) + f'.{pos_ext}')
+        neg_img   = os.path.join(self.root_dir, str(neg_name), str(neg_id) + f'.{neg_ext}')
         
         anc_img   = io.imread(anc_img)
         pos_img   = io.imread(pos_img)
@@ -110,11 +116,15 @@ def get_dataloader(train_root_dir,     valid_root_dir,
     data_transforms = {
         'train': transforms.Compose([
             transforms.ToPILImage(),
+            transforms.RandomRotation(15),
+            transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean = [0.5, 0.5, 0.5], std = [0.5, 0.5, 0.5])]),
         'valid': transforms.Compose([
             transforms.ToPILImage(),
+            transforms.Resize(224),
+            transforms.CenterCrop(224),
             transforms.ToTensor(),
             transforms.Normalize(mean = [0.5, 0.5, 0.5], std = [0.5, 0.5, 0.5])])}
 
