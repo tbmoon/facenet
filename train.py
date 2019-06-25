@@ -44,6 +44,7 @@ parser.add_argument('--train-csv-name', default='./datasets/test_vggface2.csv', 
                     help='list of training images')
 parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
                     help='list of validtion images')
+parser.add_argument('--pretrain', action='store_true')
 
 args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -51,7 +52,13 @@ l2_dist = PairwiseDistance(2)
 
 
 def main():
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes).to(device)
+    pretrain = args.pretrain
+    print(f"Transfer learning: {pretrain}")
+    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
+    if pretrain:
+        model.freeze_all()
+        model.unfreeze_fc()
+        model.unfreeze_classifier()
     model = nn.DataParallel(model)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
