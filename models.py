@@ -25,7 +25,7 @@ class FaceNetModel(nn.Module):
             self.model.layer4,
             Flatten()
         )
-        self.model.fc         = nn.Linear(25088, self.embedding_size)
+        self.model.fc = nn.Linear(25088, self.embedding_size)
         self.model.classifier = nn.Linear(self.embedding_size, num_classes)
     
     
