@@ -45,6 +45,8 @@ parser.add_argument('--train-csv-name', default='./datasets/test_vggface2.csv', 
 parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
                     help='list of validtion images')
 parser.add_argument('--pretrain', action='store_true')
+parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
+                    help='Decay learning rate schedules every --step-size (default: 50)')
 
 args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -54,6 +56,7 @@ l2_dist = PairwiseDistance(2)
 def main():
     pretrain = args.pretrain
     print(f"Transfer learning: {pretrain}")
+    print(f"Learning rate will decayed every {args.step_size}th epoch")
     model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
     if pretrain:
         model.freeze_all()
@@ -61,7 +64,7 @@ def main():
         model.unfreeze_classifier()
     model = nn.DataParallel(model)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.1)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
 
     if args.start_epoch != 0:
         checkpoint = torch.load('./log/checkpoint_epoch{}.pth'.format(args.start_epoch - 1))
