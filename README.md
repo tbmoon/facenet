@@ -11,9 +11,9 @@
 - Align face image files by following David Sandberg's instruction (part of "Face alignment").
   - https://github.com/davidsandberg/facenet/wiki/Classifier-training-of-inception-resnet-v1
 
-- Write list file of face images by running "datasets/write_csv_for_making_dataset.ipynb" 
-  - This is aready in the directory of datasets so that you don't need to do again if you are urgent.
-  - To run this one need to modify paths in accordance with location of image dataset.
+- Write list file of face images by running "datasets/write_csv_for_making_dataset.py"
+  - `python write_csv_for_making_dataset.py --root-dir=/path/to/dataset/dir --final-file=dataset.csv`
+  - `datasets/write_csv_for_making_dataset.py` file is multiprocess version of the `.ipynb` file. So generating csv dataset is faster.
   
 - Train
   - Again, one need to modify paths in accordance with location of image dataset.
