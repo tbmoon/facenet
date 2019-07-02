@@ -13,7 +13,7 @@
 
 - Write list file of face images by running "datasets/write_csv_for_making_dataset.py"
   - `python write_csv_for_making_dataset.py --root-dir=/path/to/dataset/dir --final-file=dataset.csv`
-  - `datasets/write_csv_for_making_dataset.py` file is multiprocess version of the `.ipynb` file. So generating csv dataset is faster.
+  - `datasets/write_csv_for_making_dataset.py` is multiprocess version of previous `.ipynb`. This way generating csv dataset is faster.
   
 - Train
   - Again, one need to modify paths in accordance with location of image dataset.
