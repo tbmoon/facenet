@@ -65,26 +65,27 @@ def main():
     model = nn.DataParallel(model)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
+    triplet_loss = TripletLoss(args.margin).to(device)
 
     if args.start_epoch != 0:
         checkpoint = torch.load('./log/checkpoint_epoch{}.pth'.format(args.start_epoch - 1))
         model.load_state_dict(checkpoint['state_dict'])
 
-    for epoch in range(args.start_epoch, args.num_epochs + args.start_epoch):
-        print(80 * '=')
-        print('Epoch [{}/{}]'.format(epoch, args.num_epochs + args.start_epoch - 1))
-
-        data_loaders, data_size = get_dataloader(args.train_root_dir, args.valid_root_dir,
+    
+    data_loaders, data_size = get_dataloader(args.train_root_dir, args.valid_root_dir,
                                                  args.train_csv_name, args.valid_csv_name,
                                                  args.num_train_triplets, args.num_valid_triplets,
                                                  args.batch_size, args.num_workers)
-
-        train_valid(model, optimizer, scheduler, epoch, data_loaders, data_size)
+        
+    for epoch in range(args.start_epoch, args.num_epochs + args.start_epoch):
+        print(80 * '=')
+        print('Epoch [{}/{}]'.format(epoch, args.num_epochs + args.start_epoch - 1))
+        train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
 
     print(80 * '=')
 
 
-def train_valid(model, optimizer, scheduler, epoch, dataloaders, data_size):
+def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
     for phase in ['train', 'valid']:
 
         labels, distances = [], []
@@ -137,8 +138,7 @@ def train_valid(model, optimizer, scheduler, epoch, dataloaders, data_size):
                 pos_img_pred = model(pos_hard_img).to(device)
                 neg_img_pred = model(neg_hard_img).to(device)
 
-                triplet_loss = TripletLoss(args.margin).forward(anc_hard_embed, pos_hard_embed, neg_hard_embed).to(
-                    device)
+                triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
 
                 if phase == 'train':
                     optimizer.zero_grad()
