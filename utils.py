@@ -3,7 +3,7 @@ from torch.autograd import Function
 from torch.nn.modules.distance import PairwiseDistance
 
 
-class TripletLoss(Function):
+class TripletLoss(torch.nn):
 
     def __init__(self, margin):
         super(TripletLoss, self).__init__()
