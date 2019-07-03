@@ -68,18 +68,20 @@ def main():
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if args.start_epoch != 0:
-        checkpoint = torch.load('./log/checkpoint_epoch{}.pth'.format(args.start_epoch - 1))
+        checkpoint = './log/checkpoint_epoch{}.pth'.format(args.start_epoch - 1)
+        print('loading', checkpoint)
+        checkpoint = torch.load(checkpoint)
         model.load_state_dict(checkpoint['state_dict'])
 
-    
-    data_loaders, data_size = get_dataloader(args.train_root_dir, args.valid_root_dir,
-                                                 args.train_csv_name, args.valid_csv_name,
-                                                 args.num_train_triplets, args.num_valid_triplets,
-                                                 args.batch_size, args.num_workers)
         
     for epoch in range(args.start_epoch, args.num_epochs + args.start_epoch):
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, args.num_epochs + args.start_epoch - 1))
+        
+        data_loaders, data_size = get_dataloader(args.train_root_dir, args.valid_root_dir,
+                                                 args.train_csv_name, args.valid_csv_name,
+                                                 args.num_train_triplets, args.num_valid_triplets,
+                                                 args.batch_size, args.num_workers)
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
 
     print(80 * '=')
