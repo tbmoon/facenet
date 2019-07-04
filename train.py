@@ -107,6 +107,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         if phase == 'train':
             scheduler.step()
+            if scheduler.last_epoch % scheduler.step_size == 0:
+                print("LR decayed to:", ', '.join(map(str, scheduler.get_lr())))
             model.train()
         else:
             model.eval()
