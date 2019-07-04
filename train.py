@@ -187,7 +187,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         if phase == 'train':
             torch.save({'epoch': epoch,
                         'state_dict': model.state_dict(),
-                       'optimizer_state': optim.state_dict()},
+                       'optimizer_state': optimizer.state_dict()},
                        './log/checkpoint_epoch{}.pth'.format(epoch))
         else:
             plot_roc(fpr, tpr, figure_name='./log/roc_valid_epoch_{}.png'.format(epoch))
