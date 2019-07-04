@@ -82,6 +82,8 @@ def main():
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
         model.load_state_dict(checkpoint['state_dict'])
+        if 'optimizer_state' in checkpoint.keys():
+            optimizer.load_state_dict(checkpoint['optimizer_state'])
 
         
     for epoch in range(args.start_epoch, args.num_epochs + args.start_epoch):
@@ -182,7 +184,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         if phase == 'train':
             torch.save({'epoch': epoch,
-                        'state_dict': model.state_dict()},
+                        'state_dict': model.state_dict(),
+                       'optimizer_state': optim.state_dict()},
                        './log/checkpoint_epoch{}.pth'.format(epoch))
         else:
             plot_roc(fpr, tpr, figure_name='./log/roc_valid_epoch_{}.png'.format(epoch))
