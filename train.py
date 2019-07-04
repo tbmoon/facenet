@@ -45,6 +45,8 @@ parser.add_argument('--train-csv-name', default='./datasets/test_vggface2.csv', 
 parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
                     help='list of validtion images')
 parser.add_argument('--pretrain', action='store_true')
+parser.add_argument('--fc-only', action='store_true')
+parser.add_argument('--except-fc', action='store_true')
 parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
                     help='Decay learning rate schedules every --step-size (default: 50)')
 
@@ -55,13 +57,21 @@ l2_dist = PairwiseDistance(2)
 
 def main():
     pretrain = args.pretrain
+    fc_only = args.fc_only
+    except_fc = args.except_fc
     print(f"Transfer learning: {pretrain}")
+    print("Train fc only:", fc_only)
+    print("Train except fc:", except_fc)
     print(f"Learning rate will decayed every {args.step_size}th epoch")
     model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
-    if pretrain:
+    if fc_only:
         model.freeze_all()
         model.unfreeze_fc()
         model.unfreeze_classifier()
+    if except_fc:
+        model.unfreeze_all()
+        model.freeze_fc()
+        model.freeze_classifier()
     model = nn.DataParallel(model)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)

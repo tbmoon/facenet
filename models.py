@@ -53,6 +53,14 @@ class FaceNetModel(nn.Module):
     def unfreeze_classifier(self):
         for param in self.model.classifier.parameters():
             param.requires_grad = True
+            
+    def freeze_fc(self):
+        for param in self.model.fc.parameters():
+            param.requires_grad = False
+            
+    def freeze_classifier(self):
+        for param in self.model.classifier.parameters():
+            param.requires_grad = False
 
     def forward_alpha(self, x):
         x = self.cnn(x)
