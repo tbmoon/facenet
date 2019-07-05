@@ -11,6 +11,7 @@ from data_loader import get_dataloader
 from eval_metrics import evaluate, plot_roc
 from models import FaceNetModel
 from utils import TripletLoss
+import time
 
 parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
 
@@ -47,6 +48,7 @@ parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
 parser.add_argument('--pretrain', action='store_true')
 parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
+parser.add_argument('--train-all', action='store_true', help='Train all layers')
 parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
                     help='Decay learning rate schedules every --step-size (default: 50)')
 
@@ -59,9 +61,11 @@ def main():
     pretrain = args.pretrain
     fc_only = args.fc_only
     except_fc = args.except_fc
+    train_all = args.train_all
     print(f"Transfer learning: {pretrain}")
     print("Train fc only:", fc_only)
     print("Train except fc:", except_fc)
+    print("Train all layers:", train_all)
     print(f"Learning rate will decayed every {args.step_size}th epoch")
     model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
     if fc_only:
@@ -72,6 +76,8 @@ def main():
         model.unfreeze_all()
         model.freeze_fc()
         model.freeze_classifier()
+    if train_all:
+        model.unfreeze_all()
     model = nn.DataParallel(model)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
@@ -90,12 +96,14 @@ def main():
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, args.num_epochs + args.start_epoch - 1))
         
+        time0 = time.time()
         data_loaders, data_size = get_dataloader(args.train_root_dir, args.valid_root_dir,
                                                  args.train_csv_name, args.valid_csv_name,
                                                  args.num_train_triplets, args.num_valid_triplets,
                                                  args.batch_size, args.num_workers)
+        
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
-
+        print(f'  Execution time               = {time.time()-time0}')
     print(80 * '=')
 
 
