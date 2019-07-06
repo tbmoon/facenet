@@ -109,7 +109,7 @@ def main():
 
     for epoch in range(start_epoch, args.num_epochs + start_epoch):
         print(80 * '=')
-        print('Epoch [{}/{}]'.format(epoch, args.num_epochs + args.start_epoch - 1))
+        print('Epoch [{}/{}]'.format(epoch, args.num_epochs + start_epoch - 1))
 
         time0 = time.time()
         data_loaders, data_size = get_dataloader(args.train_root_dir, args.valid_root_dir,
