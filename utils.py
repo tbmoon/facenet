@@ -24,6 +24,7 @@ def create_if_not_exist(path):
 
 
 def init_log_just_created(path):
+    create_if_not_exist(path)
     with open(path, 'r') as f:
         if len(f.readlines()) <= 0:
             init_log_line(path)

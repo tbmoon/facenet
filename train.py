@@ -62,10 +62,7 @@ def save_if_best(state, acc):
 
 
 def main():
-
-    create_if_not_exist("log/test.csv")
-    create_if_not_exist("log/train.csv")
-    init_log_just_created("log/test.csv")
+    init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
 
     pretrain = args.pretrain
