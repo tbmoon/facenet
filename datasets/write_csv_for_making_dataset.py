@@ -11,7 +11,7 @@ import time
 
 import multitasking
 import pandas as pd
-from format_multitasking_data import main as format_data
+from .format_multitasking_data import main as format_data
 
 
 def reset_csv():
