@@ -51,8 +51,6 @@ parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
 parser.add_argument('--load-best', action='store_true')
 parser.add_argument('--train-all', action='store_true', help='Train all layers')
-parser.add_argument('--load-optim-state', action='store_true',
-                    help='Chose whether to use saved state when loading best model or not')
 
 args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
