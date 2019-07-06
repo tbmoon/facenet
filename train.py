@@ -44,13 +44,13 @@ parser.add_argument('--train-csv-name', default='./datasets/test_vggface2.csv', 
                     help='list of training images')
 parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
                     help='list of validtion images')
+parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
+                    help='Decay learning rate schedules every --step-size (default: 50)')
 parser.add_argument('--pretrain', action='store_true')
 parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
 parser.add_argument('--load-best', action='store_true')
 parser.add_argument('--train-all', action='store_true', help='Train all layers')
-parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
-                    help='Decay learning rate schedules every --step-size (default: 50)')
 
 args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -78,8 +78,11 @@ def main():
     print("Train except fc:", except_fc)
     print("Train all layers:", train_all)
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
-        device)
+    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
+    triplet_loss = TripletLoss(args.margin).to(device)
+
     if fc_only:
         model.freeze_all()
         model.unfreeze_fc()
@@ -90,9 +93,6 @@ def main():
         model.freeze_classifier()
     if train_all:
         model.unfreeze_all()
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
-    triplet_loss = TripletLoss(args.margin).to(device)
 
     if args.load_best:
         checkpoint = './log/best_state.pth'
