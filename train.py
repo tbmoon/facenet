@@ -147,20 +147,20 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 else:
                     hard_triplets = np.where(all >= 0)
 
-                anc_hard_embed = anc_embed[hard_triplets].to(device)
-                pos_hard_embed = pos_embed[hard_triplets].to(device)
-                neg_hard_embed = neg_embed[hard_triplets].to(device)
+                anc_hard_embed = anc_embed[hard_triplets]
+                pos_hard_embed = pos_embed[hard_triplets]
+                neg_hard_embed = neg_embed[hard_triplets]
 
-                anc_hard_img = anc_img[hard_triplets].to(device)
-                pos_hard_img = pos_img[hard_triplets].to(device)
-                neg_hard_img = neg_img[hard_triplets].to(device)
+                anc_hard_img = anc_img[hard_triplets]
+                pos_hard_img = pos_img[hard_triplets]
+                neg_hard_img = neg_img[hard_triplets]
 
-                pos_hard_cls = pos_cls[hard_triplets].to(device)
-                neg_hard_cls = neg_cls[hard_triplets].to(device)
+                pos_hard_cls = pos_cls[hard_triplets]
+                neg_hard_cls = neg_cls[hard_triplets]
 
-                anc_img_pred = model(anc_hard_img).to(device)
-                pos_img_pred = model(pos_hard_img).to(device)
-                neg_img_pred = model(neg_hard_img).to(device)
+                anc_img_pred = model.module.forward_classifier(anc_hard_img)
+                pos_img_pred = model.module.forward_classifier(pos_hard_img)
+                neg_img_pred = model.module.forward_classifier(neg_hard_img)
 
                 triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
 
