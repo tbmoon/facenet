@@ -98,9 +98,11 @@ def main():
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state'])
+        scheduler.step(checkpoint['epoch'])
         print(f"Last epoch: {checkpoint['epoch']}"
               f"Last accuracy: {checkpoint['accuracy']}"
               f"Last loss: {checkpoint['loss']}")
+
 
     model = torch.nn.DataParallel(model)
 
