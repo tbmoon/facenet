@@ -201,7 +201,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         write_csv(f'log/{phase}.csv', [epoch, np.mean(accuracy), avg_triplet_loss])
 
-        if phase == 'train':
+        if phase == 'valid':
             save_if_best({'epoch': epoch,
                           'state_dict': model.module.state_dict(),
                           'optimizer_state': optimizer.state_dict(),
