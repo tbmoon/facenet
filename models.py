@@ -27,7 +27,7 @@ class FaceNetModel(nn.Module):
 
         self.model.fc = nn.Sequential(
             Flatten(),
-            nn.Linear(25088, self.embedding_size))
+            nn.Linear(100352, self.embedding_size))
 
         self.model.classifier = nn.Linear(self.embedding_size, num_classes)
 
@@ -70,11 +70,11 @@ class FaceNetModel(nn.Module):
         x = self.cnn(x)
         x = self.model.fc(x)
 
-        self.features = self.l2_norm(x)
+        features = self.l2_norm(x)
         # Multiply by alpha = 10 as suggested in https://arxiv.org/pdf/1703.09507.pdf
         alpha = 10
-        self.features = self.features * alpha
-        return self.features
+        features = features * alpha
+        return features
 
     def forward_classifier(self, x):
         features = self.forward(x)

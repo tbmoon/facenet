@@ -8,14 +8,14 @@ from torch.nn.modules.distance import PairwiseDistance
 from torch.optim import lr_scheduler
 
 from data_loader import get_dataloader
+from datasets.write_csv_for_making_dataset import write_csv
 from eval_metrics import evaluate, plot_roc
+from loss import TripletLoss
 from models import FaceNetModel
-from utils import TripletLoss
+from utils import ModelSaver, create_if_not_exist, init_log_just_created
 
 parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
 
-parser.add_argument('--start-epoch', default=0, type=int, metavar='SE',
-                    help='start epoch (default: 0)')
 parser.add_argument('--num-epochs', default=200, type=int, metavar='NE',
                     help='number of epochs to train (default: 200)')
 parser.add_argument('--num-classes', default=10000, type=int, metavar='NC',
@@ -47,6 +47,7 @@ parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
 parser.add_argument('--pretrain', action='store_true')
 parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
+parser.add_argument('--load-best', action='store_true')
 parser.add_argument('--train-all', action='store_true', help='Train all layers')
 parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
                     help='Decay learning rate schedules every --step-size (default: 50)')
@@ -54,13 +55,24 @@ parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
 args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
+modelsaver = ModelSaver()
+
+def save_if_best(state, acc):
+    modelsaver.save_if_best(acc, state)
 
 
 def main():
+
+    create_if_not_exist("log/test.csv")
+    create_if_not_exist("log/train.csv")
+    init_log_just_created("log/test.csv")
+    init_log_just_created("log/train.csv")
+
     pretrain = args.pretrain
     fc_only = args.fc_only
     except_fc = args.except_fc
     train_all = args.train_all
+    start_epoch = 0
     print(f"Transfer learning: {pretrain}")
     print("Train fc only:", fc_only)
     print("Train except fc:", except_fc)
@@ -82,17 +94,20 @@ def main():
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
     triplet_loss = TripletLoss(args.margin).to(device)
 
-    if args.start_epoch != 0:
-        checkpoint = './log/checkpoint_epoch{}.pth'.format(args.start_epoch - 1)
+    if args.load_best:
+        checkpoint = './log/best_state.pth'
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
+        start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
-        if 'optimizer_state' in checkpoint.keys():
-            optimizer.load_state_dict(checkpoint['optimizer_state'])
+        optimizer.load_state_dict(checkpoint['optimizer_state'])
+        print(f"Last epoch: {checkpoint['epoch']}"
+              f"Last accuracy: {checkpoint['accuracy']}"
+              f"Last loss: {checkpoint['loss']}")
 
-        model = torch.nn.DataParallel(model)
+    model = torch.nn.DataParallel(model)
 
-    for epoch in range(args.start_epoch, args.num_epochs + args.start_epoch):
+    for epoch in range(start_epoch, args.num_epochs + start_epoch):
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, args.num_epochs + args.start_epoch - 1))
 
@@ -103,7 +118,7 @@ def main():
                                                  args.batch_size, args.num_workers)
 
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
-        print(f'  Execution time               = {time.time() - time0}')
+        print(f'  Execution time                 = {time.time() - time0}')
     print(80 * '=')
 
 
@@ -187,16 +202,15 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print('  {} set - Triplet Loss       = {:.8f}'.format(phase, avg_triplet_loss))
         print('  {} set - Accuracy           = {:.8f}'.format(phase, np.mean(accuracy)))
 
-        with open('./log/{}_log_epoch{}.txt'.format(phase, epoch), 'w') as f:
-            f.write(str(epoch) + '\t' +
-                    str(np.mean(accuracy)) + '\t' +
-                    str(avg_triplet_loss))
+        write_csv(f'log/{phase}.csv', [epoch, np.mean(accuracy), avg_triplet_loss])
 
         if phase == 'train':
-            torch.save({'epoch': epoch,
-                        'state_dict': model.module.state_dict(),
-                        'optimizer_state': optimizer.state_dict()},
-                       './log/checkpoint_epoch{}.pth'.format(epoch))
+            save_if_best({'epoch': epoch,
+                          'state_dict': model.module.state_dict(),
+                          'optimizer_state': optimizer.state_dict(),
+                          'accuracy': np.mean(accuracy),
+                          'loss': avg_triplet_loss
+                          }, np.mean(accuracy))
         else:
             plot_roc(fpr, tpr, figure_name='./log/roc_valid_epoch_{}.png'.format(epoch))
 
