@@ -51,6 +51,8 @@ parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
 parser.add_argument('--load-best', action='store_true')
 parser.add_argument('--train-all', action='store_true', help='Train all layers')
+parser.add_argument('--load-optim-state', action='store_true',
+                    help='Chose whether to use saved state when loading best model or not')
 
 args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -101,7 +103,11 @@ def main():
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
-        optimizer.load_state_dict(checkpoint['optimizer_state'])
+        try:
+            optimizer.load_state_dict(checkpoint['optimizer_state'])
+        except ValueError as e:
+            print("Can't load last optimizer")
+            print(e)
         scheduler.step(checkpoint['epoch'])
         print(f"Last epoch: {checkpoint['epoch']}"
               f"Last accuracy: {checkpoint['accuracy']}"
