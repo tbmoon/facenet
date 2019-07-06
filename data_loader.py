@@ -81,7 +81,7 @@ class TripletFaceDataset(Dataset):
     def __getitem__(self, idx):
 
         anc_id, pos_id, neg_id, pos_class, neg_class, pos_name, neg_name, anc_ext, pos_ext, neg_ext = \
-        self.training_triplets[idx]
+            self.training_triplets[idx]
 
         anc_img = os.path.join(self.root_dir, str(pos_name), str(anc_id) + f'.{anc_ext}')
         pos_img = os.path.join(self.root_dir, str(pos_name), str(pos_id) + f'.{pos_ext}')
@@ -105,7 +105,6 @@ class TripletFaceDataset(Dataset):
         return sample
 
     def __len__(self):
-
         return len(self.training_triplets)
 
 
@@ -120,13 +119,15 @@ def get_dataloader(train_root_dir, valid_root_dir,
             transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])]),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225])]),
         'valid': transforms.Compose([
             transforms.ToPILImage(),
             transforms.Resize(224),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])])}
+            transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225])])}
 
     face_dataset = {
         'train': TripletFaceDataset(root_dir=train_root_dir,
