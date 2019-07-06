@@ -12,7 +12,7 @@ from datasets.write_csv_for_making_dataset import write_csv
 from eval_metrics import evaluate, plot_roc
 from loss import TripletLoss
 from models import FaceNetModel
-from utils import ModelSaver, create_if_not_exist, init_log_just_created
+from utils import ModelSaver, init_log_just_created
 
 parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
 
@@ -57,6 +57,7 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
 
+
 def save_if_best(state, acc):
     modelsaver.save_if_best(acc, state)
 
@@ -75,9 +76,8 @@ def main():
     print("Train except fc:", except_fc)
     print("Train all layers:", train_all)
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
+    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
+        device)
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
@@ -91,18 +91,21 @@ def main():
     if train_all:
         model.unfreeze_all()
 
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
+
     if args.load_best:
         checkpoint = './log/best_state.pth'
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
+        print("Stepping scheduler")
         optimizer.load_state_dict(checkpoint['optimizer_state'])
         scheduler.step(checkpoint['epoch'])
         print(f"Last epoch: {checkpoint['epoch']}"
               f"Last accuracy: {checkpoint['accuracy']}"
               f"Last loss: {checkpoint['loss']}")
-
 
     model = torch.nn.DataParallel(model)
 
