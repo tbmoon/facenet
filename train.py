@@ -1,8 +1,8 @@
 import argparse
+import time
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.optim as optim
 from torch.nn.modules.distance import PairwiseDistance
 from torch.optim import lr_scheduler
@@ -11,7 +11,6 @@ from data_loader import get_dataloader
 from eval_metrics import evaluate, plot_roc
 from models import FaceNetModel
 from utils import TripletLoss
-import time
 
 parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
 
@@ -67,7 +66,8 @@ def main():
     print("Train except fc:", except_fc)
     print("Train all layers:", train_all)
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
+    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
+        device)
     if fc_only:
         model.freeze_all()
         model.unfreeze_fc()
@@ -78,7 +78,6 @@ def main():
         model.freeze_classifier()
     if train_all:
         model.unfreeze_all()
-    model = nn.DataParallel(model)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
     triplet_loss = TripletLoss(args.margin).to(device)
@@ -91,19 +90,20 @@ def main():
         if 'optimizer_state' in checkpoint.keys():
             optimizer.load_state_dict(checkpoint['optimizer_state'])
 
-        
+        model = torch.nn.DataParallel(model)
+
     for epoch in range(args.start_epoch, args.num_epochs + args.start_epoch):
         print(80 * '=')
         print('Epoch [{}/{}]'.format(epoch, args.num_epochs + args.start_epoch - 1))
-        
+
         time0 = time.time()
         data_loaders, data_size = get_dataloader(args.train_root_dir, args.valid_root_dir,
                                                  args.train_csv_name, args.valid_csv_name,
                                                  args.num_train_triplets, args.num_valid_triplets,
                                                  args.batch_size, args.num_workers)
-        
+
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
-        print(f'  Execution time               = {time.time()-time0}')
+        print(f'  Execution time               = {time.time() - time0}')
     print(80 * '=')
 
 
@@ -158,9 +158,9 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 pos_hard_cls = pos_cls[hard_triplets]
                 neg_hard_cls = neg_cls[hard_triplets]
 
-                anc_img_pred = model.module.forward_classifier(anc_hard_img)
-                pos_img_pred = model.module.forward_classifier(pos_hard_img)
-                neg_img_pred = model.module.forward_classifier(neg_hard_img)
+                anc_img_pred = model.forward_classifier(anc_hard_img)
+                pos_img_pred = model.forward_classifier(pos_hard_img)
+                neg_img_pred = model.forward_classifier(neg_hard_img)
 
                 triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
 
@@ -194,8 +194,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
 
         if phase == 'train':
             torch.save({'epoch': epoch,
-                        'state_dict': model.state_dict(),
-                       'optimizer_state': optimizer.state_dict()},
+                        'state_dict': model.module.state_dict(),
+                        'optimizer_state': optimizer.state_dict()},
                        './log/checkpoint_epoch{}.pth'.format(epoch))
         else:
             plot_roc(fpr, tpr, figure_name='./log/roc_valid_epoch_{}.png'.format(epoch))

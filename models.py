@@ -15,7 +15,7 @@ class FaceNetModel(nn.Module):
 
         self.model = resnet50(pretrained)
         self.embedding_size = embedding_size
-        cnn = nn.Sequential(
+        self.cnn = nn.Sequential(
             self.model.conv1,
             self.model.bn1,
             self.model.relu,
@@ -24,15 +24,12 @@ class FaceNetModel(nn.Module):
             self.model.layer2,
             self.model.layer3,
             self.model.layer4)
-        self.cnn = torch.nn.DataParallel(cnn)
 
-        fc = nn.Sequential(
+        self.model.fc = nn.Sequential(
             Flatten(),
             nn.Linear(25088, self.embedding_size))
-        self.model.fc = torch.nn.DataParallel(fc)
 
-        classifier = nn.Linear(self.embedding_size, num_classes)
-        self.model.classifier = torch.nn.DataParallel(classifier)
+        self.model.classifier = nn.Linear(self.embedding_size, num_classes)
 
     def l2_norm(self, input):
         input_size = input.size()
