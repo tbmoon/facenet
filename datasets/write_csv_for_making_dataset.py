@@ -35,7 +35,7 @@ def format_data(filename):
     df.to_csv(filename, index=False)
     print('final file saved to', filename)
     global time0
-    print(f"Tooked {time.time() - time0} seconda to finish")
+    print(f"Tooked {time.time() - time0} seconds to finish")
 
 
 @multitasking.task
