@@ -58,6 +58,7 @@ class VisdomLinePlotter(object):
 
     def __init__(self, env_name='main'):
         self.viz = visdom.Visdom()
+        self.viz.check_connection()
         self.env = env_name
         self.plots = {}
 

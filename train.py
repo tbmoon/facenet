@@ -13,7 +13,7 @@ from eval_metrics import evaluate, plot_roc
 from loss import TripletLoss
 from models import FaceNetModel
 from utils import ModelSaver, init_log_just_created
-from utils import VisdomLinePlotter
+# from utils import VisdomLinePlotter
 
 parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
 
@@ -57,7 +57,7 @@ args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
-plotter = VisdomLinePlotter('Siamese Triplet')
+# plotter = VisdomLinePlotter('Siamese Triplet')
 
 
 def save_if_best(state, acc):
