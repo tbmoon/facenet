@@ -11,7 +11,6 @@ import time
 
 import multitasking
 import pandas as pd
-from .format_multitasking_data import main as format_data
 
 
 def reset_csv():
@@ -29,10 +28,18 @@ def write_csv(file, newrow):
         f_writer.writerow(newrow)
 
 
+def format_data(filename):
+    df = pd.read_csv('multitasking.csv')
+    df = df.sort_values(by=['name', 'id']).reset_index(drop=True)
+    df['class'] = pd.factorize(df['name'])[0]
+    df.to_csv(filename, index=False)
+    print('final file saved to', filename)
+    global time0
+    print(f"Tooked {time.time() - time0} seconda to finish")
+
+
 @multitasking.task
 def generate_set(data, process_name, filename):
-    time0 = time.time()
-    df = pd.DataFrame()
     print("The number of files: ", len(data))
     for idx, file in enumerate(data):
         if idx % 100 == 0:
@@ -67,6 +74,7 @@ def check_and_format(filename):
 
 if __name__ == '__main__':
     verbosity = 1
+    time0 = time.time()
 
     parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
 
