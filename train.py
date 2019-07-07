@@ -99,8 +99,8 @@ def main():
     if args.load_best:
         checkpoint = './log/best_state.pth'
         print('loading', checkpoint)
-        modelsaver.previous_acc = checkpoint['accuracy']
         checkpoint = torch.load(checkpoint)
+        modelsaver.previous_acc = checkpoint['accuracy']
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
