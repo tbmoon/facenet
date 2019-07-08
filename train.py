@@ -13,6 +13,7 @@ from eval_metrics import evaluate, plot_roc
 from loss import TripletLoss
 from models import FaceNetModel
 from utils import ModelSaver, init_log_just_created
+
 # from utils import VisdomLinePlotter
 
 parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
@@ -57,6 +58,8 @@ args = parser.parse_args()
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 l2_dist = PairwiseDistance(2)
 modelsaver = ModelSaver()
+
+
 # plotter = VisdomLinePlotter('Siamese Triplet')
 
 
@@ -100,7 +103,7 @@ def main():
         checkpoint = './log/best_state.pth'
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
-        modelsaver.previous_acc = checkpoint['accuracy']
+        modelsaver.current_acc = checkpoint['accuracy']
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
@@ -129,6 +132,10 @@ def main():
         train_valid(model, optimizer, triplet_loss, scheduler, epoch, data_loaders, data_size)
         print(f'  Execution time                 = {time.time() - time0}')
     print(80 * '=')
+
+
+def save_last_checkpoint(state):
+    torch.save(state, 'log/last_checkpoint.pth')
 
 
 def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_size):
@@ -214,6 +221,12 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         write_csv(f'log/{phase}.csv', [epoch, np.mean(accuracy), avg_triplet_loss])
 
         if phase == 'valid':
+            save_last_checkpoint({'epoch': epoch,
+                                  'state_dict': model.module.state_dict(),
+                                  'optimizer_state': optimizer.state_dict(),
+                                  'accuracy': np.mean(accuracy),
+                                  'loss': avg_triplet_loss
+                                  })
             save_if_best({'epoch': epoch,
                           'state_dict': model.module.state_dict(),
                           'optimizer_state': optimizer.state_dict(),

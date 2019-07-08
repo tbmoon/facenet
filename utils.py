@@ -27,11 +27,10 @@ class ModelSaver():
         self._previous_acc = value
 
     def __set_accuracy(self, accuracy):
-        self.previous_acc = self.current_acc
-        self.current_acc = accuracy
+        self.previous_acc, self.current_acc = self.current_acc, accuracy
 
     def save_if_best(self, accuracy, state):
-        if accuracy > self.previous_acc:
+        if accuracy > self.current_acc:
             self.__set_accuracy(accuracy)
             torch.save(state, 'log/best_state.pth')
 
