@@ -52,6 +52,7 @@ parser.add_argument('--pretrain', action='store_true')
 parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
 parser.add_argument('--load-best', action='store_true')
+parser.add_argument('--load-last', action='store_true')
 parser.add_argument('--train-all', action='store_true', help='Train all layers')
 
 args = parser.parse_args()
@@ -99,8 +100,8 @@ def main():
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
 
-    if args.load_best:
-        checkpoint = './log/best_state.pth'
+    if args.load_best or args.load_last:
+        checkpoint = './log/best_state.pth' if args.load_best else './log/last_checkpoint.pth'
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
         modelsaver.current_acc = checkpoint['accuracy']
