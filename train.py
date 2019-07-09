@@ -114,9 +114,9 @@ def main():
             print("Can't load last optimizer")
             print(e)
         scheduler.step(checkpoint['epoch'])
-        print(f"Last epoch: {checkpoint['epoch']}\n"
-              f"Last accuracy: {checkpoint['accuracy']}\n"
-              f"Last loss: {checkpoint['loss']}")
+        print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
+              f"Loaded checkpoint accuracy: {checkpoint['accuracy']}\n"
+              f"Loaded checkpoint loss: {checkpoint['loss']}")
 
     model = torch.nn.DataParallel(model)
 
