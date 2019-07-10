@@ -65,6 +65,18 @@ class FaceNetModel(nn.Module):
         for param in self.model.classifier.parameters():
             param.requires_grad = True
 
+    def unfreeze_given_layers(self, unfreeze):
+        for name, child in self.model.named_children():
+            print('edit', name)
+            if name in unfreeze:
+                print('unfreezing', name)
+                for param in child.parameters():
+                    param.requires_grad = True
+            else:
+                print('freezing', name)
+                for param in child.parameters():
+                    param.requires_grad = False
+
     # returns face embedding(embedding_size)
     def forward(self, x):
         x = self.cnn(x)

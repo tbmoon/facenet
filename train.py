@@ -86,7 +86,8 @@ def main():
     print("Train except fc:", except_fc)
     print("Train all layers:", train_all)
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
+    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
+        device)
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
@@ -100,16 +101,7 @@ def main():
     if train_all:
         model.unfreeze_all()
     if len(unfreeze) > 0:
-        for name, child in model.named_children():
-            print('edit', name)
-            if name in unfreeze:
-                print('unfreezing', name)
-                for param in child.parameters():
-                    param.requires_grad = True
-            else:
-                print('freezing', name)
-                for param in child.parameters():
-                    param.requires_grad = False
+        model.unfreeze_given_layers(unfreeze)
 
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
