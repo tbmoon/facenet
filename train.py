@@ -48,6 +48,8 @@ parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
                     help='list of validtion images')
 parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
                     help='Decay learning rate schedules every --step-size (default: 50)')
+parser.add_argument('--unfreeze', type=str, metavar='UF', default='',
+                    help='Provide an option for unfreezeing given layers')
 parser.add_argument('--pretrain', action='store_true')
 parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
@@ -76,6 +78,7 @@ def main():
     fc_only = args.fc_only
     except_fc = args.except_fc
     train_all = args.train_all
+    unfreeze = args.unfreeze.split(',')
     start_epoch = 0
     print(f"Transfer learning: {pretrain}")
     print("Train fc only:", fc_only)
@@ -96,6 +99,16 @@ def main():
         model.freeze_classifier()
     if train_all:
         model.unfreeze_all()
+    if len(unfreeze) > 0:
+        for name, child in model.named_children():
+            if name in ['layer3', 'layer4']:
+                print('unfreezing', name)
+                for param in child.parameters():
+                    param.requires_grad = True
+            else:
+                print('freezing', name)
+                for param in child.parameters():
+                    param.requires_grad = False
 
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
