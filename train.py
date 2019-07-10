@@ -55,7 +55,7 @@ parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
 parser.add_argument('--load-best', action='store_true')
 parser.add_argument('--load-last', action='store_true')
-parser.add_argument('--step-if-load', action='store_true', default=True)
+parser.add_argument('--continue-step', action='store_true')
 parser.add_argument('--train-all', action='store_true', help='Train all layers')
 
 args = parser.parse_args()
@@ -120,7 +120,7 @@ def main():
         except ValueError as e:
             print("Can't load last optimizer")
             print(e)
-        if args.step_if_load:
+        if args.continue_step:
             scheduler.step(checkpoint['epoch'])
         print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
               f"Loaded checkpoint accuracy: {checkpoint['accuracy']}\n"
