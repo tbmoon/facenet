@@ -55,6 +55,7 @@ parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
 parser.add_argument('--load-best', action='store_true')
 parser.add_argument('--load-last', action='store_true')
+parser.add_argument('--step-if-load', action='store_true', default=True)
 parser.add_argument('--train-all', action='store_true', help='Train all layers')
 
 args = parser.parse_args()
@@ -86,7 +87,8 @@ def main():
     print("Train all layers:", train_all)
     print("Train specific layers:", ', '.join(unfreeze))
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
+    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
+        device)
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
@@ -118,7 +120,8 @@ def main():
         except ValueError as e:
             print("Can't load last optimizer")
             print(e)
-        scheduler.step(checkpoint['epoch'])
+        if args.step_if_load:
+            scheduler.step(checkpoint['epoch'])
         print(f"Loaded checkpoint epoch: {checkpoint['epoch']}\n"
               f"Loaded checkpoint accuracy: {checkpoint['accuracy']}\n"
               f"Loaded checkpoint loss: {checkpoint['loss']}")
