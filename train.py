@@ -79,7 +79,6 @@ def main():
     except_fc = args.except_fc
     train_all = args.train_all
     unfreeze = args.unfreeze.split(',')
-    print(unfreeze)
     start_epoch = 0
     print(f"Transfer learning: {pretrain}")
     print("Train fc only:", fc_only)
@@ -87,8 +86,7 @@ def main():
     print("Train all layers:", train_all)
     print("Train specific layers:", ', '.join(unfreeze))
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
-        device)
+    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(device)
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
