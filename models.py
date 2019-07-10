@@ -67,13 +67,10 @@ class FaceNetModel(nn.Module):
 
     def unfreeze_given_layers(self, unfreeze):
         for name, child in self.model.named_children():
-            print('edit', name)
             if name in unfreeze:
-                print('unfreezing', name)
                 for param in child.parameters():
                     param.requires_grad = True
             else:
-                print('freezing', name)
                 for param in child.parameters():
                     param.requires_grad = False
 
