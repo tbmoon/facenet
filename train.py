@@ -101,7 +101,7 @@ def main():
         model.unfreeze_all()
     if len(unfreeze) > 0:
         for name, child in model.named_children():
-            if name in ['layer3', 'layer4']:
+            if name in unfreeze:
                 print('unfreezing', name)
                 for param in child.parameters():
                     param.requires_grad = True
