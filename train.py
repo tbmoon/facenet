@@ -79,6 +79,7 @@ def main():
     except_fc = args.except_fc
     train_all = args.train_all
     unfreeze = args.unfreeze.split(',')
+    print(unfreeze)
     start_epoch = 0
     print(f"Transfer learning: {pretrain}")
     print("Train fc only:", fc_only)
