@@ -50,8 +50,13 @@ l2_dist = PairwiseDistance(2)
 
 
 def main():
+    parallel = False
     
     model     = FaceNetModel(embedding_size = args.embedding_size, num_classes = args.num_classes).to(device)
+    if torch.cuda.device() > 1:
+      model = nn.DataParallel(model)
+      parallel = True
+    
     optimizer = optim.Adam(model.parameters(), lr = args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size = 50, gamma = 0.1)
     
@@ -124,9 +129,14 @@ def train_valid(model, optimizer, scheduler, epoch, dataloaders, data_size):
                 pos_hard_cls   = pos_cls[hard_triplets].to(device)
                 neg_hard_cls   = neg_cls[hard_triplets].to(device)
             
-                anc_img_pred   = model.forward_classifier(anc_hard_img).to(device)
-                pos_img_pred   = model.forward_classifier(pos_hard_img).to(device)
-                neg_img_pred   = model.forward_classifier(neg_hard_img).to(device)
+                if parallel:
+                    anc_img_pred   = model.module.forward_classifier(anc_hard_img).to(device)
+                    pos_img_pred   = model.module.forward_classifier(pos_hard_img).to(device)
+                    neg_img_pred   = model.module.forward_classifier(neg_hard_img).to(device)
+                else:
+                    anc_img_pred   = model.forward_classifier(anc_hard_img).to(device)
+                    pos_img_pred   = model.forward_classifier(pos_hard_img).to(device)
+                    neg_img_pred   = model.forward_classifier(neg_hard_img).to(device)            
             
                 triplet_loss   = TripletLoss(args.margin).forward(anc_hard_embed, pos_hard_embed, neg_hard_embed).to(device)
         
