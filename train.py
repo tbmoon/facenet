@@ -88,7 +88,8 @@ def main():
     print("Train fc only:", fc_only)
     print("Train except fc:", except_fc)
     print("Train all layers:", train_all)
-    print("Train specific layers:", ', '.join(unfreeze))
+    print("Unfreeze only:", ', '.join(unfreeze))
+    print("Freeze only:", ', '.join(freeze))
     print(f"Learning rate will decayed every {args.step_size}th epoch")
     model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
         device)
@@ -105,9 +106,9 @@ def main():
     if train_all:
         model.unfreeze_all()
     if len(unfreeze) > 0:
-        model.unfreeze_given_layers(unfreeze)
+        model.unfreeze_only(unfreeze)
     if len(freeze) > 0:
-        model.freeze_given_layers(freeze)
+        model.freeze_only(freeze)
 
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
