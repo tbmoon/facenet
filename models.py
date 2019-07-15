@@ -65,6 +65,15 @@ class FaceNetModel(nn.Module):
         for param in self.model.classifier.parameters():
             param.requires_grad = True
 
+    def freeze_given_layers(self, freeze):
+        for name, child in self.model.named_children():
+            if name in freeze:
+                for param in child.parameters():
+                    param.requires_grad = False
+            else:
+                for param in child.parameters():
+                    param.requires_grad = True
+
     def unfreeze_given_layers(self, unfreeze):
         for name, child in self.model.named_children():
             if name in unfreeze:

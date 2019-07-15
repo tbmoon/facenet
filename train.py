@@ -50,6 +50,8 @@ parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
                     help='Decay learning rate schedules every --step-size (default: 50)')
 parser.add_argument('--unfreeze', type=str, metavar='UF', default='',
                     help='Provide an option for unfreezeing given layers')
+parser.add_argument('--freeze', type=str, metavar='F', default='',
+                    help='Provide an option for freezeing given layers')
 parser.add_argument('--pretrain', action='store_true')
 parser.add_argument('--fc-only', action='store_true')
 parser.add_argument('--except-fc', action='store_true')
@@ -80,6 +82,7 @@ def main():
     except_fc = args.except_fc
     train_all = args.train_all
     unfreeze = args.unfreeze.split(',')
+    freeze = args.freeze.split(',')
     start_epoch = 0
     print(f"Transfer learning: {pretrain}")
     print("Train fc only:", fc_only)
@@ -103,6 +106,8 @@ def main():
         model.unfreeze_all()
     if len(unfreeze) > 0:
         model.unfreeze_given_layers(unfreeze)
+    if len(freeze) > 0:
+        model.freeze_given_layers(freeze)
 
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=0.1)
