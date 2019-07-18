@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import time
 
 import numpy as np
@@ -232,7 +233,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print('  {} set - Triplet Loss       = {:.8f}'.format(phase, avg_triplet_loss))
         print('  {} set - Accuracy           = {:.8f}'.format(phase, np.mean(accuracy)))
 
-        write_csv(f'log/{phase}.csv', [epoch, np.mean(accuracy), avg_triplet_loss])
+        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss])
 
         if phase == 'valid':
             save_last_checkpoint({'epoch': epoch,

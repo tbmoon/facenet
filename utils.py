@@ -49,7 +49,7 @@ def init_log_just_created(path):
 
 def init_log_line(path):
     with open(path, 'w') as f:
-        f.write('epoch,acc,loss\n')
+        f.write('time,epoch,acc,loss\n')
 
 
 class VisdomLinePlotter(object):
