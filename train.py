@@ -175,8 +175,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
             pos_img = batch_sample['pos_img'].to(device)
             neg_img = batch_sample['neg_img'].to(device)
 
-            pos_cls = batch_sample['pos_class'].to(device)
-            neg_cls = batch_sample['neg_class'].to(device)
+            # pos_cls = batch_sample['pos_class'].to(device)
+            # neg_cls = batch_sample['neg_class'].to(device)
 
             with torch.set_grad_enabled(phase == 'train'):
 
@@ -199,16 +199,16 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 pos_hard_embed = pos_embed[hard_triplets]
                 neg_hard_embed = neg_embed[hard_triplets]
 
-                anc_hard_img = anc_img[hard_triplets]
-                pos_hard_img = pos_img[hard_triplets]
-                neg_hard_img = neg_img[hard_triplets]
+                # anc_hard_img = anc_img[hard_triplets]
+                # pos_hard_img = pos_img[hard_triplets]
+                # neg_hard_img = neg_img[hard_triplets]
 
-                pos_hard_cls = pos_cls[hard_triplets]
-                neg_hard_cls = neg_cls[hard_triplets]
+                # pos_hard_cls = pos_cls[hard_triplets]
+                # neg_hard_cls = neg_cls[hard_triplets]
 
-                anc_img_pred = model.module.forward_classifier(anc_hard_img)
-                pos_img_pred = model.module.forward_classifier(pos_hard_img)
-                neg_img_pred = model.module.forward_classifier(neg_hard_img)
+                # anc_img_pred = model.module.forward_classifier(anc_hard_img)
+                # pos_img_pred = model.module.forward_classifier(pos_hard_img)
+                # neg_img_pred = model.module.forward_classifier(neg_hard_img)
 
                 triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
 
