@@ -91,18 +91,16 @@ def main():
     print("Unfreeze only:", ', '.join(unfreeze))
     print("Freeze only:", ', '.join(freeze))
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
-        device)
+    model = FaceNetModel(pretrained=pretrain)
+    model.to(device)
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
         model.freeze_all()
         model.unfreeze_fc()
-        model.unfreeze_classifier()
     if except_fc:
         model.unfreeze_all()
         model.freeze_fc()
-        model.freeze_classifier()
     if train_all:
         model.unfreeze_all()
     if len(unfreeze) > 0:
