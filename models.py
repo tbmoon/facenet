@@ -25,6 +25,7 @@ class FaceNetModel(nn.Module):
             self.model.layer3,
             self.model.layer4)
 
+        # modify fc layer based on https://arxiv.org/abs/1703.07737
         self.model.fc = nn.Sequential(
             Flatten(),
             nn.Linear(100352, 1024),
