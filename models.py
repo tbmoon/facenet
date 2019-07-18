@@ -28,9 +28,9 @@ class FaceNetModel(nn.Module):
         # modify fc layer based on https://arxiv.org/abs/1703.07737
         self.model.fc = nn.Sequential(
             Flatten(),
-            nn.Linear(100352, 1024),
-            nn.BatchNorm1d(1024),
-            nn.ReLU(),
+            # nn.Linear(100352, 1024),
+            # nn.BatchNorm1d(1024),
+            # nn.ReLU(),
             nn.Linear(1024, self.embedding_size))
 
     def l2_norm(self, input):
