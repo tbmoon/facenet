@@ -31,7 +31,7 @@ class FaceNetModel(nn.Module):
             # nn.Linear(100352, 1024),
             # nn.BatchNorm1d(1024),
             # nn.ReLU(),
-            nn.Linear(1024, self.embedding_size))
+            nn.Linear(100352, self.embedding_size))
 
     def l2_norm(self, input):
         input_size = input.size()
