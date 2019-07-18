@@ -36,16 +36,13 @@ parser.add_argument('--learning-rate', default=0.001, type=float, metavar='LR',
                     help='learning rate (default: 0.001)')
 parser.add_argument('--margin', default=0.5, type=float, metavar='MG',
                     help='margin (default: 0.5)')
-parser.add_argument('--train-root-dir',
-                    default='/run/media/hoosiki/WareHouse2/home/mtb/datasets/vggface2/test_mtcnnpy_182', type=str,
+parser.add_argument('--train-root-dir', default='/home/khairulimam/datasets/vggv2/test-mtcnn-182/', type=str,
                     help='path to train root dir')
-parser.add_argument('--valid-root-dir', default='/run/media/hoosiki/WareHouse2/home/mtb/datasets/lfw/lfw_mtcnnpy_182',
-                    type=str,
+parser.add_argument('--valid-root-dir', default='/home/khairulimam/datasets/lfw-mtcnn-182/', type=str,
                     help='path to valid root dir')
-parser.add_argument('--train-csv-name', default='./datasets/test_vggface2.csv', type=str,
+parser.add_argument('--train-csv-name', default='datasets/test-vggv2-mtcnn-182.csv', type=str,
                     help='list of training images')
-parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
-                    help='list of validtion images')
+parser.add_argument('--valid-csv-name', default='datasets/lfw-mtcnn-182.csv', type=str, help='list of validtion images')
 parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
                     help='Decay learning rate schedules every --step-size (default: 50)')
 parser.add_argument('--unfreeze', type=str, metavar='UF', default='',
