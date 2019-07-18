@@ -76,6 +76,9 @@ def save_if_best(state, acc):
 def main():
     init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
+    import pandas as pd
+    valid = pd.read_csv('log/valid.csv')
+    max_acc = valid['acc'].max()
 
     pretrain = args.pretrain
     fc_only = args.fc_only
@@ -90,6 +93,7 @@ def main():
     print("Train all layers:", train_all)
     print("Unfreeze only:", ', '.join(unfreeze))
     print("Freeze only:", ', '.join(freeze))
+    print(f"Max acc: {max_acc:.4f}")
     print(f"Learning rate will decayed every {args.step_size}th epoch")
     model = FaceNetModel(pretrained=pretrain)
     model.to(device)
@@ -115,7 +119,7 @@ def main():
         checkpoint = './log/best_state.pth' if args.load_best else './log/last_checkpoint.pth'
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
-        modelsaver.current_acc = checkpoint['accuracy']
+        modelsaver.current_acc = max_acc
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
