@@ -40,7 +40,6 @@ class FaceNetModel(nn.Module):
         norm = torch.sqrt(normp)
         _output = torch.div(input, norm.view(-1, 1).expand_as(input))
         output = _output.view(input_size)
-
         return output
 
     def freeze_all(self):
