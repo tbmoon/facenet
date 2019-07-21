@@ -230,7 +230,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print('  {} set - Accuracy           = {:.8f}'.format(phase, np.mean(accuracy)))
 
         time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        lr = '_'.join(scheduler.get_lr())
+        lr = '_'.join(map(str, scheduler.get_lr()))
         layers = '+'.join(args.unfreeze.split(','))
         write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss, layers, args.batch_size, lr])
 
