@@ -234,7 +234,9 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print('  {} set - Accuracy           = {:.8f}'.format(phase, np.mean(accuracy)))
 
         time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss])
+        lr = '_'.join(scheduler.get_lr())
+        layers = '+'.join(args.unfreeze.split(','))
+        write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss, layers, args.batch_size, lr])
 
         if phase == 'valid':
             save_last_checkpoint({'epoch': epoch,
