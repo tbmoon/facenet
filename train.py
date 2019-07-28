@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import time
 
 import numpy as np
@@ -20,14 +21,10 @@ parser = argparse.ArgumentParser(description='Face Recognition using Triplet Los
 
 parser.add_argument('--num-epochs', default=200, type=int, metavar='NE',
                     help='number of epochs to train (default: 200)')
-parser.add_argument('--num-classes', default=10000, type=int, metavar='NC',
-                    help='number of clases (default: 10000)')
 parser.add_argument('--num-train-triplets', default=10000, type=int, metavar='NTT',
                     help='number of triplets for training (default: 10000)')
 parser.add_argument('--num-valid-triplets', default=10000, type=int, metavar='NVT',
                     help='number of triplets for vaidation (default: 10000)')
-parser.add_argument('--embedding-size', default=128, type=int, metavar='ES',
-                    help='embedding size (default: 128)')
 parser.add_argument('--batch-size', default=64, type=int, metavar='BS',
                     help='batch size (default: 128)')
 parser.add_argument('--num-workers', default=8, type=int, metavar='NW',
@@ -36,16 +33,13 @@ parser.add_argument('--learning-rate', default=0.001, type=float, metavar='LR',
                     help='learning rate (default: 0.001)')
 parser.add_argument('--margin', default=0.5, type=float, metavar='MG',
                     help='margin (default: 0.5)')
-parser.add_argument('--train-root-dir',
-                    default='/run/media/hoosiki/WareHouse2/home/mtb/datasets/vggface2/test_mtcnnpy_182', type=str,
+parser.add_argument('--train-root-dir', default='/home/khairulimam/datasets/vggv2/test-mtcnn-182/', type=str,
                     help='path to train root dir')
-parser.add_argument('--valid-root-dir', default='/run/media/hoosiki/WareHouse2/home/mtb/datasets/lfw/lfw_mtcnnpy_182',
-                    type=str,
+parser.add_argument('--valid-root-dir', default='/home/khairulimam/datasets/lfw-mtcnn-182/', type=str,
                     help='path to valid root dir')
-parser.add_argument('--train-csv-name', default='./datasets/test_vggface2.csv', type=str,
+parser.add_argument('--train-csv-name', default='datasets/test-vggv2-mtcnn-182.csv', type=str,
                     help='list of training images')
-parser.add_argument('--valid-csv-name', default='./datasets/lfw.csv', type=str,
-                    help='list of validtion images')
+parser.add_argument('--valid-csv-name', default='datasets/lfw-mtcnn-182.csv', type=str, help='list of validtion images')
 parser.add_argument('--step-size', default=50, type=int, metavar='SZ',
                     help='Decay learning rate schedules every --step-size (default: 50)')
 parser.add_argument('--unfreeze', type=str, metavar='UF', default='',
@@ -76,6 +70,9 @@ def save_if_best(state, acc):
 def main():
     init_log_just_created("log/valid.csv")
     init_log_just_created("log/train.csv")
+    import pandas as pd
+    valid = pd.read_csv('log/valid.csv')
+    max_acc = valid['acc'].max()
 
     pretrain = args.pretrain
     fc_only = args.fc_only
@@ -90,19 +87,18 @@ def main():
     print("Train all layers:", train_all)
     print("Unfreeze only:", ', '.join(unfreeze))
     print("Freeze only:", ', '.join(freeze))
+    print(f"Max acc: {max_acc:.4f}")
     print(f"Learning rate will decayed every {args.step_size}th epoch")
-    model = FaceNetModel(embedding_size=args.embedding_size, num_classes=args.num_classes, pretrained=pretrain).to(
-        device)
+    model = FaceNetModel(pretrained=pretrain)
+    model.to(device)
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
         model.freeze_all()
         model.unfreeze_fc()
-        model.unfreeze_classifier()
     if except_fc:
         model.unfreeze_all()
         model.freeze_fc()
-        model.freeze_classifier()
     if train_all:
         model.unfreeze_all()
     if len(unfreeze) > 0:
@@ -117,7 +113,7 @@ def main():
         checkpoint = './log/best_state.pth' if args.load_best else './log/last_checkpoint.pth'
         print('loading', checkpoint)
         checkpoint = torch.load(checkpoint)
-        modelsaver.current_acc = checkpoint['accuracy']
+        modelsaver.current_acc = max_acc
         start_epoch = checkpoint['epoch'] + 1
         model.load_state_dict(checkpoint['state_dict'])
         print("Stepping scheduler")
@@ -173,8 +169,8 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
             pos_img = batch_sample['pos_img'].to(device)
             neg_img = batch_sample['neg_img'].to(device)
 
-            pos_cls = batch_sample['pos_class'].to(device)
-            neg_cls = batch_sample['neg_class'].to(device)
+            # pos_cls = batch_sample['pos_class'].to(device)
+            # neg_cls = batch_sample['neg_class'].to(device)
 
             with torch.set_grad_enabled(phase == 'train'):
 
@@ -197,16 +193,16 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 pos_hard_embed = pos_embed[hard_triplets]
                 neg_hard_embed = neg_embed[hard_triplets]
 
-                anc_hard_img = anc_img[hard_triplets]
-                pos_hard_img = pos_img[hard_triplets]
-                neg_hard_img = neg_img[hard_triplets]
+                # anc_hard_img = anc_img[hard_triplets]
+                # pos_hard_img = pos_img[hard_triplets]
+                # neg_hard_img = neg_img[hard_triplets]
 
-                pos_hard_cls = pos_cls[hard_triplets]
-                neg_hard_cls = neg_cls[hard_triplets]
+                # pos_hard_cls = pos_cls[hard_triplets]
+                # neg_hard_cls = neg_cls[hard_triplets]
 
-                anc_img_pred = model.module.forward_classifier(anc_hard_img)
-                pos_img_pred = model.module.forward_classifier(pos_hard_img)
-                neg_img_pred = model.module.forward_classifier(neg_hard_img)
+                # anc_img_pred = model.module.forward_classifier(anc_hard_img)
+                # pos_img_pred = model.module.forward_classifier(pos_hard_img)
+                # neg_img_pred = model.module.forward_classifier(neg_hard_img)
 
                 triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
 
@@ -233,7 +229,10 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
         print('  {} set - Triplet Loss       = {:.8f}'.format(phase, avg_triplet_loss))
         print('  {} set - Accuracy           = {:.8f}'.format(phase, np.mean(accuracy)))
 
-        write_csv(f'log/{phase}.csv', [epoch, np.mean(accuracy), avg_triplet_loss])
+        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        lr = '_'.join(map(str, scheduler.get_lr()))
+        layers = '+'.join(args.unfreeze.split(','))
+        write_csv(f'log/{phase}.csv', [time, epoch, np.mean(accuracy), avg_triplet_loss, layers, args.batch_size, lr])
 
         if phase == 'valid':
             save_last_checkpoint({'epoch': epoch,

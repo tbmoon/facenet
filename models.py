@@ -10,11 +10,11 @@ class Flatten(nn.Module):
 
 
 class FaceNetModel(nn.Module):
-    def __init__(self, embedding_size, num_classes, pretrained=False):
+    def __init__(self, pretrained=False):
         super(FaceNetModel, self).__init__()
 
         self.model = resnet50(pretrained)
-        self.embedding_size = embedding_size
+        self.embedding_size = 128
         self.cnn = nn.Sequential(
             self.model.conv1,
             self.model.bn1,
@@ -25,11 +25,13 @@ class FaceNetModel(nn.Module):
             self.model.layer3,
             self.model.layer4)
 
+        # modify fc layer based on https://arxiv.org/abs/1703.07737
         self.model.fc = nn.Sequential(
             Flatten(),
+            # nn.Linear(100352, 1024),
+            # nn.BatchNorm1d(1024),
+            # nn.ReLU(),
             nn.Linear(100352, self.embedding_size))
-
-        self.model.classifier = nn.Linear(self.embedding_size, num_classes)
 
     def l2_norm(self, input):
         input_size = input.size()
@@ -38,7 +40,6 @@ class FaceNetModel(nn.Module):
         norm = torch.sqrt(normp)
         _output = torch.div(input, norm.view(-1, 1).expand_as(input))
         output = _output.view(input_size)
-
         return output
 
     def freeze_all(self):
@@ -55,14 +56,6 @@ class FaceNetModel(nn.Module):
 
     def unfreeze_fc(self):
         for param in self.model.fc.parameters():
-            param.requires_grad = True
-
-    def freeze_classifier(self):
-        for param in self.model.classifier.parameters():
-            param.requires_grad = False
-
-    def unfreeze_classifier(self):
-        for param in self.model.classifier.parameters():
             param.requires_grad = True
 
     def freeze_only(self, freeze):
