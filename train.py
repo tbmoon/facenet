@@ -94,11 +94,9 @@ def main():
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
-        model.freeze_all()
-        model.unfreeze_fc()
+	model.unfreeze_only(['fc', 'classifier'])
     if except_fc:
-        model.unfreeze_all()
-        model.freeze_fc()
+       model.freeze_only(['fc', 'classifier']) 
     if train_all:
         model.unfreeze_all()
     if len(unfreeze) > 0:
@@ -193,16 +191,16 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 pos_hard_embed = pos_embed[hard_triplets]
                 neg_hard_embed = neg_embed[hard_triplets]
 
-                # anc_hard_img = anc_img[hard_triplets]
-                # pos_hard_img = pos_img[hard_triplets]
-                # neg_hard_img = neg_img[hard_triplets]
+                anc_hard_img = anc_img[hard_triplets]
+                pos_hard_img = pos_img[hard_triplets]
+                neg_hard_img = neg_img[hard_triplets]
 
                 # pos_hard_cls = pos_cls[hard_triplets]
                 # neg_hard_cls = neg_cls[hard_triplets]
 
-                # anc_img_pred = model.module.forward_classifier(anc_hard_img)
-                # pos_img_pred = model.module.forward_classifier(pos_hard_img)
-                # neg_img_pred = model.module.forward_classifier(neg_hard_img)
+                anc_img_pred = model.module.forward_classifier(anc_hard_img)
+                pos_img_pred = model.module.forward_classifier(pos_hard_img)
+                neg_img_pred = model.module.forward_classifier(neg_hard_img)
 
                 triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
 
