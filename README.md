@@ -1,6 +1,7 @@
 # Facenet for face recognition using pytorch
 - Pytorch implementation of the paper: "FaceNet: A Unified Embedding for Face Recognition and Clustering".
 - Training of network is done using triplet loss.
+- This work is modified in some functionality from the original work by [Taebong Moon](https://github.com/tbmoon/facenet) and then retrained for the purpose of completing my BS degree. The full report can be found at [Verifikasi Kemiripan Wajah Dengan _Deep Learning_ Menggunakan Arsitektur _Siamese_](https://github.com/khrlimam/skripsi/raw/master/pdfs/finishing.pdf)
 
 
 # How to train/validate model
@@ -13,7 +14,7 @@
 
 - Write list file of face images by running "datasets/write_csv_for_making_dataset.py"
   - `python write_csv_for_making_dataset.py --root-dir=/path/to/dataset/dir --final-file=dataset.csv`
-  - `datasets/write_csv_for_making_dataset.py` is multiprocess version of previous `.ipynb`. This way generating csv dataset is faster.
+  - `datasets/write_csv_for_making_dataset.py` is multiprocess version of previous `.ipynb`. This way generating csv dataset is much faster.
   
 - Train
   - Again, one need to modify paths in accordance with location of image dataset.
@@ -32,7 +33,10 @@
 
 - ROC curve on LFW datasets for validation
 
-![roc curve](./log/tmp/roc_valid_epoch_39.png)
+![roc curve](./log/tmp/roc.png)
+
+- Test the model on 25 pair of images
+![Test Result on 25 pair of images](./log/tmp/test-result.png)
 
 
 # References
