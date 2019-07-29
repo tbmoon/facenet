@@ -35,11 +35,12 @@
 
 ![roc curve](./log/tmp/roc.png)
 
-- Test the model on 25 pair of images
-![Test Result on 25 pair of images](./log/tmp/test-result.png)
+- Test the model on 30 pair of images
+![Test Result on 30 pair of images](./log/tmp/test-result.png)
 
 
 # References
 - https://github.com/liorshk/facenet_pytorch 
 - https://github.com/davidsandberg/facenet
 - https://arxiv.org/abs/1503.03832
+- https://arxiv.org/abs/1703.07737
