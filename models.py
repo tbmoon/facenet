@@ -15,6 +15,7 @@ class FaceNetModel(nn.Module):
 
         self.model = resnet50(pretrained)
         self.embedding_size = 128
+        num_classes = 500
         self.cnn = nn.Sequential(
             self.model.conv1,
             self.model.bn1,
@@ -33,7 +34,7 @@ class FaceNetModel(nn.Module):
             # nn.ReLU(),
             nn.Linear(100352, self.embedding_size))
 
-	self.model.classifier = nn.Linear(self.embedding_size, num_classes)
+        self.model.classifier = nn.Linear(self.embedding_size, num_classes)
 
     def l2_norm(self, input):
         input_size = input.size()
