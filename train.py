@@ -94,9 +94,9 @@ def main():
     triplet_loss = TripletLoss(args.margin).to(device)
 
     if fc_only:
-	model.unfreeze_only(['fc', 'classifier'])
+        model.unfreeze_only(['fc', 'classifier'])
     if except_fc:
-       model.freeze_only(['fc', 'classifier']) 
+        model.freeze_only(['fc', 'classifier'])
     if train_all:
         model.unfreeze_all()
     if len(unfreeze) > 0:

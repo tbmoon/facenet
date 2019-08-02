@@ -2,6 +2,37 @@ import torch
 import torch.nn as nn
 from torchvision.models import resnet50
 
+try:
+    from torch.hub import load_state_dict_from_url
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url
+
+model_urls = dict(
+    acc_920='https://github.com/khrlimam/facenet/releases/download/acc-0.920/last_checkpoint_no_optimizer.pth',
+    acc_921='https://github.com/khrlimam/facenet/releases/download/acc-0.92135/best_state_92_no_optimizer.pth'
+)
+
+
+def load_state(arch, progress=True):
+    state = load_state_dict_from_url(model_urls.get(arch), progress=progress)
+    return state
+
+
+def model_920(pretrained=True, progress=True):
+    model = FaceNetModel()
+    if pretrained:
+        state = load_state('acc_920', progress)
+        model.load_state_dict(state['state_dict'])
+    return model
+
+
+def model_921(pretrained=True, progress=True):
+    model = FaceNetModel()
+    if pretrained:
+        state = load_state('acc_921', progress)
+        model.load_state_dict(state['state_dict'])
+    return model
+
 
 class Flatten(nn.Module):
 
@@ -14,7 +45,7 @@ class FaceNetModel(nn.Module):
         super(FaceNetModel, self).__init__()
 
         self.model = resnet50(pretrained)
-        self.embedding_size = 128
+        embedding_size = 128
         num_classes = 500
         self.cnn = nn.Sequential(
             self.model.conv1,
@@ -32,9 +63,9 @@ class FaceNetModel(nn.Module):
             # nn.Linear(100352, 1024),
             # nn.BatchNorm1d(1024),
             # nn.ReLU(),
-            nn.Linear(100352, self.embedding_size))
+            nn.Linear(100352, embedding_size))
 
-        self.model.classifier = nn.Linear(self.embedding_size, num_classes)
+        self.model.classifier = nn.Linear(embedding_size, num_classes)
 
     def l2_norm(self, input):
         input_size = input.size()
