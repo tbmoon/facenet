@@ -1,4 +1,4 @@
-# Facenet for face recognition using pytorch
+# Facenet for face verification using pytorch
 - Pytorch implementation of the paper: "FaceNet: A Unified Embedding for Face Recognition and Clustering".
 - Training of network is done using triplet loss.
 - This work is modified in some functionality from the original work by [Taebong Moon](https://github.com/tbmoon/facenet) and then retrained for the purpose of completing my BS degree. The full report can be found at [Verifikasi Kemiripan Wajah Dengan _Deep Learning_ Menggunakan Arsitektur _Siamese_](https://github.com/khrlimam/skripsi/raw/master/pdfs/finishing.pdf)
