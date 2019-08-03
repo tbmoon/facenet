@@ -2,6 +2,8 @@
 - Pytorch implementation of the paper: "FaceNet: A Unified Embedding for Face Recognition and Clustering".
 - Training of network is done using triplet loss.
 - This work is modified in some functionality from the original work by [Taebong Moon](https://github.com/tbmoon/facenet) and then retrained for the purpose of completing my BS degree. The full report can be found at [Verifikasi Kemiripan Wajah Dengan _Deep Learning_ Menggunakan Arsitektur _Siamese_](https://github.com/khrlimam/skripsi/raw/master/pdfs/finishing.pdf)
+- To use the pretrained model please refer to this repo: https://github.com/khrlimam/res-facenet
+- If you wish to try the demo app please clone this repo and follow the installation instruction: https://github.com/krhlimam/demo-facenet
 
 
 # How to train/validate model
