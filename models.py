@@ -8,8 +8,8 @@ except ImportError:
     from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
 model_urls = dict(
-    acc_920='https://github.com/khrlimam/facenet/releases/download/acc-0.920/last_checkpoint_no_optimizer.pth',
-    acc_921='https://github.com/khrlimam/facenet/releases/download/acc-0.92135/best_state_92_no_optimizer.pth'
+    acc_920='https://github.com/khrlimam/facenet/releases/download/acc-0.920/model920-d8cffbf5.pth',
+    acc_921='https://github.com/khrlimam/facenet/releases/download/acc-0.92135/model921-baf1060d.pth'
 )
 
 
