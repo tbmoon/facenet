@@ -2,7 +2,6 @@ import argparse
 import os
 from pathlib import Path
 
-import multitasking
 from PIL import Image
 from torch_mtcnn import detect_faces
 
@@ -15,7 +14,7 @@ def valid_ext(ext):
     return ext.lower() in ['.jpg', '.jpeg', '.png']
 
 
-def detect_and_store(path, final_root_dir, new_size, processname):
+def detect_and_store(path, final_root_dir, new_size):
     img = Image.open(path)
     bounding_boxes, landmarks = detect_faces(img)
 
@@ -32,20 +31,10 @@ def detect_and_store(path, final_root_dir, new_size, processname):
         final_name = os.path.join(dst, path.name)
         try:
             img.crop((a, b, c, d)).resize((new_size, new_size), Image.BILINEAR).save(final_name)
-            print(processname, '-', get_dir_and_file(path), 'saved to', final_name)
+            print(get_dir_and_file(path), 'saved to', final_name)
         except Exception as e:
             print("Error occured when saving", get_dir_and_file(path))
             print("Error: ", str(e))
-
-
-@multitasking.task
-def start_cropping(paths, processname):
-    for path in paths:
-        if not valid_ext(path.suffix):
-            print(get_dir_and_file(path), 'is not valid image. Expected extensions: .jpg, .jpeg, .png')
-            continue
-        detect_and_store(path, final_dir, args.resize, processname)
-    print('Process', processname, 'finished!')
 
 
 if __name__ == '__main__':
@@ -60,11 +49,9 @@ if __name__ == '__main__':
     paths = Path(args.root_dir).glob('*/*')
     final_dir = args.final_dir
 
-    chunks = list(paths)
-    div = len(chunks) // 2
+    for path in paths:
+        if not valid_ext(path.suffix):
+            print(get_dir_and_file(path), 'is not valid image. Expected extensions: .jpg, .jpeg, .png')
+            continue
 
-    chunk1 = chunks[:div]
-    chunk2 = chunks[div:]
-
-    start_cropping(chunk1, 'chunk1')
-    start_cropping(chunk2, 'chunk2')
+        detect_and_store(path, final_dir, args.resize)
