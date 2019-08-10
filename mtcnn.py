@@ -61,14 +61,10 @@ if __name__ == '__main__':
     final_dir = args.final_dir
 
     chunks = list(paths)
-    div = len(chunks) // 4
+    div = len(chunks) // 2
 
     chunk1 = chunks[:div]
-    chunk2 = chunks[div:div * 2]
-    chunk3 = chunks[div * 2:div * 3]
-    chunk4 = chunks[div * 3:]
+    chunk2 = chunks[div:]
 
     start_cropping(chunk1, 'chunk1')
     start_cropping(chunk2, 'chunk2')
-    start_cropping(chunk3, 'chunk3')
-    start_cropping(chunk4, 'chunk4')
