@@ -2,6 +2,7 @@ import argparse
 import os
 from pathlib import Path
 
+import multitasking
 from PIL import Image
 from torch_mtcnn import detect_faces
 
@@ -14,7 +15,7 @@ def valid_ext(ext):
     return ext.lower() in ['.jpg', '.jpeg', '.png']
 
 
-def detect_and_store(path, final_root_dir, new_size):
+def detect_and_store(path, final_root_dir, new_size, processname):
     img = Image.open(path)
     bounding_boxes, landmarks = detect_faces(img)
 
@@ -31,10 +32,20 @@ def detect_and_store(path, final_root_dir, new_size):
         final_name = os.path.join(dst, path.name)
         try:
             img.crop((a, b, c, d)).resize((new_size, new_size), Image.BILINEAR).save(final_name)
-            print(get_dir_and_file(path), 'saved to', final_name)
+            print('PROCESS: ', processname, '-', get_dir_and_file(path), 'saved to', final_name)
         except Exception as e:
             print("Error occured when saving", get_dir_and_file(path))
             print("Error: ", str(e))
+
+
+@multitasking.task
+def start_cropping(paths, processname):
+    for path in paths:
+        if not valid_ext(path.suffix):
+            print(get_dir_and_file(path), 'is not valid image. Expected extensions: .jpg, .jpeg, .png')
+            continue
+        detect_and_store(path, final_dir, args.resize, processname)
+    print('Process', processname, 'finished!')
 
 
 if __name__ == '__main__':
@@ -49,9 +60,23 @@ if __name__ == '__main__':
     paths = Path(args.root_dir).glob('*/*')
     final_dir = args.final_dir
 
-    for path in paths:
-        if not valid_ext(path.suffix):
-            print(get_dir_and_file(path), 'is not valid image. Expected extensions: .jpg, .jpeg, .png')
-            continue
+    chunks = list(paths)
+    div = len(chunks) // 8
 
-        detect_and_store(path, final_dir, args.resize)
+    chunk1 = chunks[:div]
+    chunk2 = chunks[div:div * 2]
+    chunk3 = chunks[div * 2:div * 3]
+    chunk4 = chunks[div * 3:div * 4]
+    chunk5 = chunks[div * 4:div * 5]
+    chunk6 = chunks[div * 5:div * 6]
+    chunk7 = chunks[div * 6:div * 7]
+    chunk8 = chunks[div * 7:]
+
+    start_cropping(chunk1, 'chunk1')
+    start_cropping(chunk2, 'chunk2')
+    start_cropping(chunk3, 'chunk3')
+    start_cropping(chunk4, 'chunk4')
+    start_cropping(chunk5, 'chunk5')
+    start_cropping(chunk6, 'chunk6')
+    start_cropping(chunk7, 'chunk7')
+    start_cropping(chunk8, 'chunk8')
