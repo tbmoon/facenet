@@ -18,7 +18,7 @@ def detect_and_store(path, final_root_dir, new_size):
     img = Image.open(path)
     bounding_boxes, landmarks = detect_faces(img)
 
-    if bounding_boxes.shape[0] == 0:
+    if len(bounding_boxes) == 0:
         print("No face detected on image", get_dir_and_file(path))
 
     '''
