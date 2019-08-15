@@ -193,9 +193,9 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 # pos_hard_cls = pos_cls[hard_triplets]
                 # neg_hard_cls = neg_cls[hard_triplets]
 
-                anc_img_pred = model.module.forward_classifier(anc_hard_img)
-                pos_img_pred = model.module.forward_classifier(pos_hard_img)
-                neg_img_pred = model.module.forward_classifier(neg_hard_img)
+                model.module.forward_classifier(anc_hard_img)
+                model.module.forward_classifier(pos_hard_img)
+                model.module.forward_classifier(neg_hard_img)
 
                 triplet_loss = triploss.forward(anc_hard_embed, pos_hard_embed, neg_hard_embed)
 
@@ -204,13 +204,11 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                     triplet_loss.backward()
                     optimizer.step()
 
-                dists = l2_dist.forward(anc_embed, pos_embed)
-                distances.append(dists.data.cpu().numpy())
-                labels.append(np.ones(dists.size(0)))
+                distances.append(pos_dist.data.cpu().numpy())
+                labels.append(np.ones(pos_dist.size(0)))
 
-                dists = l2_dist.forward(anc_embed, neg_embed)
-                distances.append(dists.data.cpu().numpy())
-                labels.append(np.zeros(dists.size(0)))
+                distances.append(neg_dist.data.cpu().numpy())
+                labels.append(np.zeros(neg_dist.size(0)))
 
                 triplet_loss_sum += triplet_loss.item()
 
