@@ -37,7 +37,11 @@
 
 ![roc curve](./log/tmp/roc.png)
 
-- Test the model on 30 pair of images
+- True counts on each threshold
+
+![True counts on each threshold](./log/tmp/threshold.png)
+
+- Test the model on 30 pair of images with threshold 1.5
 ![Test Result on 30 pair of images](./log/tmp/test-result.png)
 
 
