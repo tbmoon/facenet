@@ -2,6 +2,9 @@
 - Pytorch implementation of the paper: "FaceNet: A Unified Embedding for Face Recognition and Clustering".
 - Training of network is done using triplet loss.
 
+# Difference from Main Repository
+- This repository takes advantage of Pytorch's DataParallel capacities to experience a much faster training time.
+
 
 # How to train/validate model
 - Download vggface2 (for training) and lfw (for validation) datasets.
