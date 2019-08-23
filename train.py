@@ -170,7 +170,7 @@ def train_valid(model, optimizer, triploss, scheduler, epoch, dataloaders, data_
                 # anc_embed, pos_embed and neg_embed are encoding(embedding) of image
                 anc_embed, pos_embed, neg_embed = model(anc_img), model(pos_img), model(neg_img)
 
-                # choose the hard negatives only for "training"
+                # choose the semi hard negatives only for "training"
                 pos_dist = l2_dist.forward(anc_embed, pos_embed)
                 neg_dist = l2_dist.forward(anc_embed, neg_embed)
 
