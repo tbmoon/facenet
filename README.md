@@ -3,7 +3,7 @@
 - Training of network is done using triplet loss.
 - This work is modified in some functionality from the original work by [Taebong Moon](https://github.com/tbmoon/facenet) and then retrained for the purpose of completing my BS degree. The full report can be found at this folder: [full-and-paper-report](https://github.com/khrlimam/skripsi/raw/master/pdfs)
 - To use the pretrained model please refer to this repo: https://github.com/khrlimam/res-facenet
-- If you wish to try the demo app please clone this repo and follow the installation instruction: https://github.com/krhlimam/demo-facenet
+- If you wish to try the demo app please clone this repo and follow the installation instruction: https://github.com/khrlimam/demo-facenet
 
 
 # How to train/validate model
