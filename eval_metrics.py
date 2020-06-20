@@ -1,28 +1,26 @@
-import operator
 import numpy as np
-from sklearn.model_selection import KFold
 from scipy import interpolate
+from sklearn.model_selection import KFold
 
 
 def evaluate(distances, labels, nrof_folds=10):
     # Calculate evaluation metrics
-    thresholds = np.arange(0, 30, 0.01)
+    thresholds = np.arange(0.3, 5, 0.1)
     tpr, fpr, accuracy = calculate_roc(thresholds, distances,
-        labels, nrof_folds=nrof_folds)
+                                       labels, nrof_folds=nrof_folds)
     thresholds = np.arange(0, 30, 0.001)
     val, val_std, far = calculate_val(thresholds, distances,
-        labels, 1e-3, nrof_folds=nrof_folds)
+                                      labels, 1e-3, nrof_folds=nrof_folds)
     return tpr, fpr, accuracy, val, val_std, far
 
 
 def calculate_roc(thresholds, distances, labels, nrof_folds=10):
-
     nrof_pairs = min(len(labels), len(distances))
     nrof_thresholds = len(thresholds)
     k_fold = KFold(n_splits=nrof_folds, shuffle=False)
 
-    tprs = np.zeros((nrof_folds,nrof_thresholds))
-    fprs = np.zeros((nrof_folds,nrof_thresholds))
+    tprs = np.zeros((nrof_folds, nrof_thresholds))
+    fprs = np.zeros((nrof_folds, nrof_thresholds))
     accuracy = np.zeros((nrof_folds))
 
     indices = np.arange(nrof_pairs)
@@ -35,11 +33,14 @@ def calculate_roc(thresholds, distances, labels, nrof_folds=10):
             _, _, acc_train[threshold_idx] = calculate_accuracy(threshold, distances[train_set], labels[train_set])
         best_threshold_index = np.argmax(acc_train)
         for threshold_idx, threshold in enumerate(thresholds):
-            tprs[fold_idx,threshold_idx], fprs[fold_idx,threshold_idx], _ = calculate_accuracy(threshold, distances[test_set], labels[test_set])
-        _, _, accuracy[fold_idx] = calculate_accuracy(thresholds[best_threshold_index], distances[test_set], labels[test_set])
+            tprs[fold_idx, threshold_idx], fprs[fold_idx, threshold_idx], _ = calculate_accuracy(threshold,
+                                                                                                 distances[test_set],
+                                                                                                 labels[test_set])
+        _, _, accuracy[fold_idx] = calculate_accuracy(thresholds[best_threshold_index], distances[test_set],
+                                                      labels[test_set])
 
-        tpr = np.mean(tprs,0)
-        fpr = np.mean(fprs,0)
+        tpr = np.mean(tprs, 0)
+        fpr = np.mean(fprs, 0)
     return tpr, fpr, accuracy
 
 
@@ -50,9 +51,9 @@ def calculate_accuracy(threshold, dist, actual_issame):
     tn = np.sum(np.logical_and(np.logical_not(predict_issame), np.logical_not(actual_issame)))
     fn = np.sum(np.logical_and(np.logical_not(predict_issame), actual_issame))
 
-    tpr = 0 if (tp+fn==0) else float(tp) / float(tp+fn)
-    fpr = 0 if (fp+tn==0) else float(fp) / float(fp+tn)
-    acc = float(tp+tn)/dist.size
+    tpr = 0 if (tp + fn == 0) else float(tp) / float(tp + fn)
+    fpr = 0 if (fp + tn == 0) else float(fp) / float(fp + tn)
+    acc = float(tp + tn) / dist.size
     return tpr, fpr, acc
 
 
@@ -72,7 +73,7 @@ def calculate_val(thresholds, distances, labels, far_target=1e-3, nrof_folds=10)
         far_train = np.zeros(nrof_thresholds)
         for threshold_idx, threshold in enumerate(thresholds):
             _, far_train[threshold_idx] = calculate_val_far(threshold, distances[train_set], labels[train_set])
-        if np.max(far_train)>=far_target:
+        if np.max(far_train) >= far_target:
             f = interpolate.interp1d(far_train, thresholds, kind='slinear')
             threshold = f(far_target)
         else:
@@ -95,27 +96,27 @@ def calculate_val_far(threshold, dist, actual_issame):
     if n_diff == 0:
         n_diff = 1
     if n_same == 0:
-        return 0,0
+        return 0, 0
     val = float(true_accept) / float(n_same)
     far = float(false_accept) / float(n_diff)
     return val, far
 
 
-def plot_roc(fpr,tpr,figure_name="roc.png"):
+def plot_roc(fpr, tpr, figure_name="roc.png"):
     import matplotlib.pyplot as plt
     plt.switch_backend('Agg')
 
-    from sklearn.metrics import roc_curve, auc
+    from sklearn.metrics import auc
     roc_auc = auc(fpr, tpr)
     fig = plt.figure()
     lw = 2
-    plt.plot(fpr, tpr, color='red',
+    plt.plot(fpr, tpr, color='#16a085',
              lw=lw, label='ROC curve (area = %0.2f)' % roc_auc)
-    plt.plot([0, 1], [0, 1], color='blue', lw=lw, linestyle='--')
+    plt.plot([0, 1], [0, 1], color='#2c3e50', lw=lw, linestyle='--')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title('Receiver operating characteristic')
-    plt.legend(loc="lower right")
+    plt.legend(loc="lower right", frameon=False)
     fig.savefig(figure_name, dpi=fig.dpi)
